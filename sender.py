@@ -60,13 +60,18 @@ def send_email():
     else:
         # SMTP normal + STARTTLS
         with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.ehlo()
+            server.ehlo() # Saludar al servidor
             try:
-                server.starttls()
-                server.ehlo()
-            except Exception:
-                # algunos servidores no soportan STARTTLS; seguir sin él
-                pass
+                server.starttls() # Intentar iniciar cifrado TLS
+                server.ehlo() # Saludar de nuevo sobre la conexión cifrada
+            except smtplib.SMTPException as e:
+                # Si el servidor NO soporta STARTTLS u otro error
+                # NO continuar, ya que el login no sería seguro.
+                print(f"Error al iniciar STARTTLS: {e}")
+                # Lanzar una excepción para detener la ejecución
+                raise RuntimeError("No se pudo establecer una conexión segura (STARTTLS).")
+            
+            # Solo si STARTTLS tuvo éxito, proceder con el login
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
 

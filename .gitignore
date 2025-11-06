@@ -1,0 +1,11 @@
+# Archivos de credenciales y configuración local
+.env
+.env.*
+!/.env.example
+
+# Directorios de cache de Python
+__pycache__/
+*.pyc
+
+# Otros
+.DS_Store
